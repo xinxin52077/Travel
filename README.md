@@ -1817,3 +1817,59 @@ export default {
 
 CityHeader后期不需要更新。
 
+#### CitySearch城市搜索框区域开发
+
+1. 在components文件夹下，新建CitySearch.vue组件，如：
+```vue
+<template>
+    <div class="search">
+        <input class="search-input" type="text" placeholder="输入城市名或拼音"/>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'CitySearch'
+}
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles.styl'
+.search
+    height: .72rem
+    background: $bgColor
+    padding: 0 .1rem
+    .search-input
+        height: .62rem
+        line-height: .62rem
+        width: 100%
+        text-align: center
+        border-radius: .06rem
+        color: #666
+        padding: 0 .1rem
+        box-sizing: border-box
+</style>
+```
+
+2. 在City.vue引入CityHeader.vue组件，如：
+```vue
+<template>
+  <div class="city">
+    <city-header></city-header>
+    <city-search></city-search>
+  </div>
+</template>
+
+<script>
+import CityHeader from '../components/CityHeader'
+import CitySearch from '../components/CitySearch'
+export default {
+  name: 'City',
+  components: {
+    CityHeader,
+    CitySearch
+  },
+}
+</script>
+```
+
