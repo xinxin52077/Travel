@@ -371,3 +371,329 @@ export default {
 </script>
 ```
 
+#### 图标区域
+
+1. 在components文件夹下，新建一个Icons.vue放置图标的组件，如：
+```vue
+<template>
+  <div class="icons">
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+    <div class="icon">
+      <div class="icon-img">
+        <img
+          class="icon-img-content"
+          src="https://s.qunarzz.com/homenode/images/touchheader/piao.png"
+          alt
+        />
+      </div>
+      <p class="icon-desc">景点门票</p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeIcons",
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.icons {
+  height: 0;
+  padding-bottom: 50%;
+  overflow: hidden;
+
+  .icon {
+    position: relative;
+    height: 0;
+    padding-bottom: 25%;
+    width: 25%;
+    float: left;
+    overflow: hidden;
+
+    .icon-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0.44rem;
+      box-sizing: border-box;
+      padding: 0.1rem;
+
+      .icon-img-content {
+        height: 100%;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+
+    .icon-desc {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 0.44rem;
+      line-height: 0.44rem;
+      text-align: center;
+      color: $darkTextColor;
+    }
+  }
+}
+</style>
+```
+
+2. 在Home.vue主页组件中引入图标组件Icons.vue，如：
+```vue
+<template>
+  <div class="home">
+    <home-header></home-header>
+    <home-swiper></home-swiper>
+    <home-icons></home-icons>
+  </div>
+</template>
+
+<script>
+import HomeHeader from '../components/Header'
+import HomeSwiper from '../components/Swiper'
+import HomeIcons from '../components/Icons'
+export default {
+  name: 'Home',
+  components: {
+    HomeHeader,
+    HomeSwiper,
+    HomeIcons
+  }
+}
+</script>
+```
+
+3. 当页面超过了8个图标的时候，让它可以像轮播图一样可以滑动到第二页。如：
+```vue
+<template>
+  <div class="icons">
+    <swiper>
+      <swiper-slide v-for="(page, index) of pages" :key="index">
+        <div class="icon" v-for="item of page" :key="item.id">
+          <div class="icon-img">
+            <img class="icon-img-content" :src="item.imgUrl" />
+          </div>
+          <p class="icon-desc">{{ item.desc }}</p>
+        </div>
+      </swiper-slide>
+    </swiper>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeIcons",
+  data() {
+    return {
+      iconList: [
+        {
+          id: "0001",
+          imgUrl: "https://s.qunarzz.com/homenode/images/touchheader/piao.png",
+          desc: "景点门票水水水水",
+        },
+        {
+          id: "0002",
+          imgUrl:
+            "https://s.qunarzz.com/homenode/images/touchheader/package.png",
+          desc: "度假",
+        },
+        {
+          id: "0003",
+          imgUrl: "https://s.qunarzz.com/homenode/images/touchheader/piao.png",
+          desc: "景点门票",
+        },
+        {
+          id: "0004",
+          imgUrl:
+            "https://s.qunarzz.com/homenode/images/touchheader/package.png",
+          desc: "度假",
+        },
+        {
+          id: "0005",
+          imgUrl: "https://s.qunarzz.com/homenode/images/touchheader/piao.png",
+          desc: "景点门票",
+        },
+        {
+          id: "0006",
+          imgUrl:
+            "https://s.qunarzz.com/homenode/images/touchheader/package.png",
+          desc: "度假",
+        },
+        {
+          id: "0007",
+          imgUrl: "https://s.qunarzz.com/homenode/images/touchheader/piao.png",
+          desc: "景点门票",
+        },
+        {
+          id: "0008",
+          imgUrl:
+            "https://s.qunarzz.com/homenode/images/touchheader/package.png",
+          desc: "度假",
+        },
+        {
+          id: "0009",
+          imgUrl: "https://s.qunarzz.com/homenode/images/touchheader/piao.png",
+          desc: "景点门票",
+        },
+        {
+          id: "0010",
+          imgUrl:
+            "https://s.qunarzz.com/homenode/images/touchheader/package.png",
+          desc: "度假",
+        },
+      ],
+    };
+  },
+  computed: {
+    pages() {
+      const pages = [];
+      this.iconList.forEach((item, index) => {
+        const page = Math.floor(index / 8);
+        if (!pages[page]) {
+          pages[page] = [];
+        }
+        pages[page].push(item);
+      });
+      return pages;
+    },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+@import '../assets/mixins.styl';
+
+.icons >>> .swiper-container {
+  height: 0;
+  padding-bottom: 50%;
+}
+
+.icon {
+  position: relative;
+  height: 0;
+  padding-bottom: 25%;
+  width: 25%;
+  float: left;
+  overflow: hidden;
+
+  .icon-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0.44rem;
+    box-sizing: border-box;
+    padding: 0.1rem;
+
+    .icon-img-content {
+      height: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  .icon-desc {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.44rem;
+    line-height: 0.44rem;
+    text-align: center;
+    color: $darkTextColor;
+    ellipsis();
+  }
+}
+</style>
+```
+
+4. 在assets文件夹下新建一个文件mixins.styl，当文字溢出打点，如：
+```styl
+ellipsis()
+  overflow: hidden
+  white-space: nowrap
+  text-overflow: ellipsis
+```
+
+更新一下assets文件夹下的varibles.styl文件，如：
+```styl
+$bgColor = #00bcd4
+$darkTextColor = #333
+```
+
