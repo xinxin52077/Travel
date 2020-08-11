@@ -1873,3 +1873,320 @@ export default {
 </script>
 ```
 
+#### CityList城市列表区域开发
+
+1. 在components文件夹下，新建CityList.vue组件，如：
+```vue
+<template>
+  <div class="list">
+    <!-- 当前城市 -->
+    <div class="area">
+      <div class="title border-topbottom">当前城市</div>
+      <div class="button-list">
+        <div class="button-wrapper">
+          <div class="button">北京</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 热门城市 -->
+    <div class="area">
+      <div class="title border-topbottom">热门城市</div>
+      <div class="button-list">
+        <div class="button-wrapper">
+          <div class="button">北京</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 字母选择城市 -->
+    <div class="area">
+      <div class="title border-topbottom">A</div>
+      <div class="item-list">
+        <div class="item border-bottom">大连</div>
+        <div class="item border-bottom">大连</div>
+        <div class="item border-bottom">大连</div>
+        <div class="item border-bottom">大连</div>
+        <div class="item border-bottom">大连</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "CityList",
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+2. 在City.vue引入CityList.vue组件，如：
+```vue
+<template>
+  <div class="city">
+    <city-header></city-header>
+    <city-search></city-search>
+    <city-list></city-list>
+  </div>
+</template>
+
+<script>
+import CityHeader from '../components/CityHeader'
+import CitySearch from '../components/CitySearch'
+import CityList from '../components/CityList'
+export default {
+  name: 'City',
+  components: {
+    CityHeader,
+    CitySearch,
+    CityList
+  },
+}
+</script>
+```
+
+3. 完善CityList.vue组件中的scroll滑动
+
+安装 npm install better-scroll --save
+
+在CityList.vue组件中引入并使用better-scroll，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">北京</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">北京</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div class="area">
+        <div class="title border-topbottom">A</div>
+        <div class="item-list">
+          <div class="item border-bottom">大连</div>
+          <div class="item border-bottom">大连</div>
+          <div class="item border-bottom">大连</div>
+          <div class="item border-bottom">大连</div>
+          <div class="item border-bottom">大连</div>
+          <div class="item border-bottom">大连</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CityList",
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+4. 在components文件夹下，新建Alphabet.vue组件。
+
+字母选择城市组件，如：
+```vue
+<template>
+  <ul class="list">
+    <li class="item">A</li>
+    <li class="item">A</li>
+    <li class="item">A</li>
+    <li class="item">A</li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "CityAlphabet",
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles'
+.list {
+  position: absolute;
+  top: 1.58rem;
+  right: 0;
+  bottom: 0;
+  width: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .item {
+    text-align: center;
+    line-height: 0.4rem;
+    color: $bgColor;
+  }
+}
+</style>
+```
+
+在City.vue中引入Alphabet.vue组件。如：
+```vue
+<template>
+  <div class="city">
+    <city-header></city-header>
+    <city-search></city-search>
+    <city-list></city-list>
+    <city-alphabet></city-alphabet>
+  </div>
+</template>
+
+<script>
+import CityHeader from '../components/CityHeader'
+import CitySearch from '../components/CitySearch'
+import CityList from '../components/CityList'
+import CityAlphabet from '../components/Alphabet'
+export default {
+  name: 'City',
+  components: {
+    CityHeader,
+    CitySearch,
+    CityList,
+    CityAlphabet
+  },
+}
+</script>
+```
+
