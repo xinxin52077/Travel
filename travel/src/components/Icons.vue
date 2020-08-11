@@ -102,40 +102,44 @@ export default {
   padding-bottom: 50%;
 }
 
-.icon {
-  position: relative;
-  height: 0;
-  padding-bottom: 25%;
-  width: 25%;
-  float: left;
-  overflow: hidden;
+.icons {
+  margin-top: 0.1rem;
 
-  .icon-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0.44rem;
-    box-sizing: border-box;
-    padding: 0.1rem;
+  .icon {
+    position: relative;
+    height: 0;
+    padding-bottom: 25%;
+    width: 25%;
+    float: left;
+    overflow: hidden;
 
-    .icon-img-content {
-      height: 100%;
-      display: block;
-      margin: 0 auto;
+    .icon-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0.44rem;
+      box-sizing: border-box;
+      padding: 0.1rem;
+
+      .icon-img-content {
+        height: 100%;
+        display: block;
+        margin: 0 auto;
+      }
     }
-  }
 
-  .icon-desc {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 0.44rem;
-    line-height: 0.44rem;
-    text-align: center;
-    color: $darkTextColor;
-    ellipsis();
+    .icon-desc {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 0.44rem;
+      line-height: 0.44rem;
+      text-align: center;
+      color: $darkTextColor;
+      ellipsis();
+    }
   }
 }
 </style>
