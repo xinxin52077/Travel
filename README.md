@@ -1851,7 +1851,7 @@ export default {
 </style>
 ```
 
-2. 在City.vue引入CityHeader.vue组件，如：
+2. 在City.vue引入CitySearch.vue组件，如：
 ```vue
 <template>
   <div class="city">
