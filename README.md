@@ -1702,4 +1702,118 @@ export default {
 
 Weekend.vue组件到现在已经完成了，后期可以不管了。
 
+### city城市区域开发
+
+#### 城市区域CityHeader开发
+
+1. 在views文件夹下新建一个City.vue城市页面主文件
+
+```vue
+<template>
+  <div class="about">
+  </div>
+</template>
+
+<script>
+import CityHeader from '../components/CityHeader'
+export default {
+  name: 'City',
+}
+</script>
+```
+
+然后在路由router中需要配置，如：
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Home from '../views/Home.vue'
+import City from '../views/City.vue'
+
+Vue.use(VueRouter);
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/city',
+    name: 'City',
+    component: City
+  }
+]
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+})
+
+export default router;
+```
+
+2. 在components文件夹下，新建CityHeader.vue组件
+```vue
+<template>
+  <div class="header">
+    城市选择
+    <router-link to="/">
+    <div class="iconfont header-back">&#xe624;</div>
+    </router-link>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "CityHeader",
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header {
+  position: relative;
+  overflow: hidden;
+  height: $headerHeight;
+  line-height: $headerHeight;
+  text-align: center;
+  color: #fff;
+  background: $bgColor;
+  font-size: 0.32rem;
+
+  .header-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.64rem;
+    text-align: center;
+    font-size: 0.4rem;
+    color: #fff;
+  }
+}
+</style>
+```
+
+3. 在City.vue引入CityHeader.vue组件，如：
+```vue
+<template>
+  <div class="about">
+    <city-header></city-header>
+  </div>
+</template>
+
+<script>
+import CityHeader from '../components/CityHeader'
+export default {
+  name: 'City',
+  components: {
+    CityHeader,
+  },
+}
+</script>
+```
+
+CityHeader后期不需要更新。
 
