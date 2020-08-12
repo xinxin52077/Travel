@@ -2415,4 +2415,490 @@ export default {
 </style>
 ```
 
+#### city组件间的联动
+
+1. 点击city页面右侧的字母进行切换城市，更新CityList.vue组件，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">北京</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div 
+          class="button-wrapper" 
+          v-for="item of hot"
+          :key="item.id"
+
+          >
+            <div class="button">{{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div 
+      class="area" 
+      v-for="(item, key) of cities"
+      :key="key"
+      :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+          class="item border-bottom"
+          v-for="innerItem of item"
+          :key="innerItem.id"
+          >{{innerItem.name}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CityList",
+  props: {
+    hot: Array,
+    cities: Object,
+    letter: String
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
+  },
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+2. City.vue需要从Alphabet拿到letter数据，然后再把数据通过props传递给CityList.vue组件，更新City.vue组件，如：
+```vue
+<template>
+  <div class="city">
+    <city-header></city-header>
+    <city-search></city-search>
+    <city-list 
+    :cities="cities" 
+    :hot="hotCities" 
+    :letter="letter"
+    ></city-list>
+    <city-alphabet 
+    :cities="cities" 
+    @change="handleLetterChange"
+    ></city-alphabet>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+import CityHeader from '../components/CityHeader'
+import CitySearch from '../components/CitySearch'
+import CityList from '../components/CityList'
+import CityAlphabet from '../components/Alphabet'
+export default {
+  name: 'City',
+  data () {
+    return {
+      cities: {},
+      hotCities: [],
+      letter: ''
+    }
+  },
+  components: {
+    CityHeader,
+    CitySearch,
+    CityList,
+    CityAlphabet
+  },
+  methods: {
+    getCityInfo () {
+      axios.get('/api/city.json')
+        .then(this.handleGetCityInfoSucc)
+    },
+    handleGetCityInfoSucc(res) {
+      // console.log(res)
+      res = res.data;
+      if (res.ret && res.data) {
+        const data = res.data
+        this.cities = data.cities
+        this.hotCities = data.hotCities
+      }
+    },
+    handleLetterChange (letter) {
+      this.letter = letter;
+    }
+  },
+  mounted () {
+    this.getCityInfo()
+  }
+}
+</script>
+```
+
+3. 滚动字母表的同时，左边对应的数据也需要滚动，要与右边字母相对于，更新Alphabet.vue组件，如：
+```vue
+<template>
+  <ul class="list">
+    <li 
+    class="item"
+    v-for="item of letters"
+    :key="item"
+    :ref="item"
+    @touchstart.prevent="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+    @click="handleLetterClick"
+    >{{item}}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "CityAlphabet",
+  data () {
+    return {
+      touchStatus: false,
+    }
+  },
+  props: {
+    cities: Object
+  },
+  computed: {
+    letters () {
+      const letters = [];
+      for (let i in this.cities) {
+        letters.push(i);
+      }
+      return letters;
+    }
+  },
+  methods: {
+    handleLetterClick (e) {
+      // console.log(e.target.innerText);
+      this.$emit('change', e.target.innerText);
+    },
+    handleTouchStart () {
+      this.touchStatus = true;
+    },
+    handleTouchMove (e) {
+      if (this.touchStatus) {
+        // 从A元素的顶部到输入框底部的距离
+        const startY = this.$refs['A'][0].offsetTop;
+        // console.log(startY);
+        // 手指滑动的距离到输入框底部的距离
+        const touchY = e.touches[0].clientY - 79;
+        // console.log(touchY);
+        // 当前手指滑动的位置对应的字母是什么
+        const index = Math.floor((touchY - startY) / 20);
+        // console.log(index)
+        if (index >= 0 && index < this.letters.length) {
+            this.$emit('change', this.letters[index]);
+        }
+      }
+    },
+    handleTouchEnd() {
+      this.touchStatus = false;
+    }
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles'
+.list {
+  position: absolute;
+  top: 1.58rem;
+  right: 0;
+  bottom: 0;
+  width: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .item {
+    text-align: center;
+    line-height: 0.4rem;
+    color: $bgColor;
+  }
+}
+</style>
+```
+
+#### 列表切换性能优化
+
+1. 更新Alphabet.vue组件
+
+性能优化，如：
+```vue
+<template>
+  <ul class="list">
+    <li 
+    class="item"
+    v-for="item of letters"
+    :key="item"
+    :ref="item"
+    @touchstart.prevent="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+    @click="handleLetterClick"
+    >{{item}}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "CityAlphabet",
+  data () {
+    return {
+      touchStatus: false,
+      startY: 0,
+    }
+  },
+  props: {
+    cities: Object
+  },
+  computed: {
+    letters () {
+      const letters = [];
+      for (let i in this.cities) {
+        letters.push(i);
+      }
+      return letters;
+    }
+  },
+  updated () {
+    this.startY = this.$refs['A'][0].offsetTop;
+  },
+  methods: {
+    handleLetterClick (e) {
+      // console.log(e.target.innerText);
+      this.$emit('change', e.target.innerText);
+    },
+    handleTouchStart () {
+      this.touchStatus = true;
+    },
+    handleTouchMove (e) {
+      if (this.touchStatus) {
+        // 手指滑动的距离到输入框底部的距离
+        const touchY = e.touches[0].clientY - 79;
+        // console.log(touchY);
+        // 当前手指滑动的位置对应的字母是什么
+        const index = Math.floor((touchY - this.startY) / 20);
+        // console.log(index)
+        if (index >= 0 && index < this.letters.length) {
+            this.$emit('change', this.letters[index]);
+        }
+      }
+    },
+    handleTouchEnd() {
+      this.touchStatus = false;
+    }
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles'
+.list {
+  position: absolute;
+  top: 1.58rem;
+  right: 0;
+  bottom: 0;
+  width: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .item {
+    text-align: center;
+    line-height: 0.4rem;
+    color: $bgColor;
+  }
+}
+</style>
+```
+
+函数节流操作，限制字母表的滑动频率，如：
+```vue
+<template>
+  <ul class="list">
+    <li
+      class="item"
+      v-for="item of letters"
+      :key="item"
+      :ref="item"
+      @touchstart.prevent="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+      @click="handleLetterClick"
+    >{{item}}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "CityAlphabet",
+  data() {
+    return {
+      touchStatus: false,
+      startY: 0,
+      timer: null,
+    };
+  },
+  props: {
+    cities: Object,
+  },
+  computed: {
+    letters() {
+      const letters = [];
+      for (let i in this.cities) {
+        letters.push(i);
+      }
+      return letters;
+    },
+  },
+  updated() {
+    this.startY = this.$refs["A"][0].offsetTop;
+  },
+  methods: {
+    handleLetterClick(e) {
+      // console.log(e.target.innerText);
+      this.$emit("change", e.target.innerText);
+    },
+    handleTouchStart() {
+      this.touchStatus = true;
+    },
+    handleTouchMove(e) {
+      if (this.touchStatus) {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+
+        // 当你正在滑动字母，限制16毫秒后再次滑动
+        this.timer = setTimeout(() => {
+          // 手指滑动的距离到输入框底部的距离
+          const touchY = e.touches[0].clientY - 79;
+          // console.log(touchY);
+          // 当前手指滑动的位置对应的字母是什么
+          const index = Math.floor((touchY - this.startY) / 20);
+          // console.log(index)
+          if (index >= 0 && index < this.letters.length) {
+            this.$emit("change", this.letters[index]);
+          }
+        }, 16);
+      }
+    },
+    handleTouchEnd() {
+      this.touchStatus = false;
+    },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  right: 0;
+  bottom: 0;
+  width: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .item {
+    text-align: center;
+    line-height: 0.4rem;
+    color: $bgColor;
+  }
+}
+</style>
+```
+
+Alphabet.vue组件后期不用更新。
+
 

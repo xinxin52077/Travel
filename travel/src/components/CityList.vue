@@ -31,6 +31,7 @@
       class="area" 
       v-for="(item, key) of cities"
       :key="key"
+      :ref="key"
       >
         <div class="title border-topbottom">{{key}}</div>
         <div class="item-list">
@@ -52,7 +53,16 @@ export default {
   props: {
     hot: Array,
     cities: Object,
-    // letter: String
+    letter: String
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
   },
   mounted () {
     // 滑动
