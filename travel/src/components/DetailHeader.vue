@@ -38,6 +38,10 @@ export default {
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
   },
+  unmounted () {
+    // 页面隐藏时解绑
+    window.removeEventListener('scroll', this.handleScroll)
+  }
 };
 </script>
 

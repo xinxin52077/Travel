@@ -5018,4 +5018,213 @@ export default {
 </style>
 ```
 
+#### 对全局事件的解绑
+
+更新DetailHeader.vue组件，如：
+```vue
+<template>
+  <div>
+    <router-link tag="div" to="/" class="header-abs" v-show="showAbs">
+      <div class="iconfont header-abs-back">&#xe624;</div>
+    </router-link>
+    <div class="header-fixed" v-show="!showAbs" :style="opacityStyle">
+      <router-link to="/">
+        <div class="iconfont header-fixed-back">&#xe624;</div>
+      </router-link>景点详情
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "DetailHeader",
+  data() {
+    return {
+      showAbs: true,
+      opacityStyle: {
+        opacity: 0,
+      },
+    };
+  },
+  methods: {
+    handleScroll() {
+      const top = document.documentElement.scrollTop;
+      if (top > 60) {
+        let opacity = top / 140;
+        opacity = opacity > 1 ? 1 : opacity;
+        this.opacityStyle = { opacity };
+        this.showAbs = false;
+      } else {
+        this.showAbs = true;
+      }
+    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  unmounted () {
+    // 页面隐藏时解绑
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header-abs {
+  position: absolute;
+  left: 0.2rem;
+  top: 0.2rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 0.4rem;
+  background: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  line-height: 0.8rem;
+
+  .header-abs-back {
+    color: #fff;
+    font-size: 0.4rem;
+  }
+}
+
+.header-fixed {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $headerHeight;
+  line-height: $headerHeight;
+  text-align: center;
+  color: #fff;
+  background: $bgColor;
+  font-size: 0.32rem;
+
+  .header-fixed-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.64rem;
+    text-align: center;
+    font-size: 0.4rem;
+    color: #fff;
+  }
+}
+</style>
+```
+
+DetailHeader.vue组件已更新完成。
+
+#### 使用递归组件实现详情页列表
+
+1. 在components文件夹下，新建一个DetailList.vue组件，如：
+```vue
+<template>
+  <div>
+    <div class="item" v-for="(item, index) of list" :key="index">
+      <div class="item-title border-bottom">
+        <span class="item-title-icon"></span>
+        {{item.title}}
+      </div>
+      <div v-if="item.children" class="item-chilren">
+          <!-- 递归组件：在组件的自身调用组件自己 -->
+        <detail-list :list="item.children"></detail-list>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "DetailList", // 就是给自己调用自己组件使用的
+  props: {
+    list: Array,
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.item-title-icon {
+  position: relative;
+  left: 0.06rem;
+  top: 0.06rem;
+  display: inline-block;
+  width: 0.36rem;
+  height: 0.36rem;
+  background: url('http://s.qunarzz.com/piao/image/touch/sight/detail.png') 0 -0.45rem no-repeat; // s.qunarzz.com/piao/image/touch/sight/detail.png) 0 -.45rem no-repeat
+  margin-right: 0.1rem;
+  background-size: 0.4rem 3rem;
+}
+
+.item-title {
+  line-height: 0.8rem;
+  font-size: 0.32rem;
+  padding: 0 0.2rem;
+}
+
+.item-chilren {
+  padding: 0 0.2rem;
+}
+</style>
+```
+
+2. 在Detail.vue组件引入DetailList.vue组件，如：
+```vue
+<template>
+  <div class="detail">
+    <detail-banner></detail-banner>
+    <detail-header></detail-header>
+    <div class="content">
+        <detail-list :list="list"></detail-list>
+    </div>
+  </div>
+</template>
+
+<script>
+import DetailBanner from "../components/Banner";
+import DetailHeader from "../components/DetailHeader";
+import DetailList from '../components/DetailList';
+export default {
+  name: "Detail",
+  data () {
+    return {
+      list: [{
+          title: '成人票',
+          children: [{
+              title: '成人三观',
+              children: [{
+                  title: '222222222'
+              }]
+          },{
+              title: '成人2444',
+              children: [{
+                  title: '333333333'
+              }]
+          },]
+      },{
+          title: '学生票'
+      },{
+          title: '儿童票'
+      },{
+          title: '特惠票'
+      }]
+    }
+  },
+  components: {
+    DetailBanner,
+    DetailHeader,
+    DetailList
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.content {
+  height: 50rem;
+}
+</style>
+```
+
 
