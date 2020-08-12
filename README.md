@@ -4506,4 +4506,219 @@ export default {
 
 Home.vue组件更新完成。
 
+### 详情页开发
+
+1. 点击热销推荐可以进入详情页
+
+更新Recommend.vue组件，如：
+```vue
+<template>
+  <div>
+    <div class="title">热销推荐</div>
+    <ul>
+      <router-link 
+      tag="li"
+      class="item border-bottom" 
+      v-for="item of list" 
+      :key="item.id"
+      :to="'/detail/' + item.id"
+      >
+        <img class="item-img" :src="item.imgUrl" />
+        <div class="item-info">
+          <p class="item-title">{{ item.title }}</p>
+          <p class="item-desc">{{ item.desc }}</p>
+          <button class="item-button">查看详情</button>
+        </div>
+      </router-link>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeRecommend",
+  props: {
+    list: Array,
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/mixins';
+
+.title {
+  line-height: 0.8rem;
+  background: #eee;
+  text-indent: 0.2rem;
+  margin-top: 0.2rem;
+}
+
+.item {
+  display: flex;
+  height: 1.9rem;
+  overflow: hidden;
+
+  .item-img {
+    width: 1.7rem;
+    height: 1.7rem;
+    padding: 0.1rem;
+  }
+
+  .item-info {
+    flex: 1;
+    padding: 0.1rem;
+    min-width: 0;
+
+    .item-title {
+      line-height: 0.54rem;
+      font-size: 0.32rem;
+      ellipsis();
+    }
+
+    .item-desc {
+      line-height: 0.4rem;
+      color: #ccc;
+      ellipsis();
+    }
+
+    .item-button {
+      background: #ff9300;
+      padding: 0 0.2rem;
+      border-radius: 0.06rem;
+      color: #fff;
+      margin-top: 0.16rem;
+      line-height: 0.44rem;
+    }
+  }
+}
+</style>
+```
+
+Recommend.vue组件更新完成。
+
+2. 在components文件夹下新建Banner.vue组件，如：
+```vue
+<template>
+  <div class="banner">
+    <img
+      class="banner-img"
+      src="https://tr-osdcp.qunarzz.com/tr-osd-tr-space/img/f1a9be7a999cfb38a16303c124814f70.jpg?ver=1"
+    />
+    <div class="banner-info">
+      <div class="banner-tittle">大量数十三点是的地方方法共同话题</div>
+      <div class="banner-number">
+        <span class="iconfont banner-icon">&#xe635;</span>
+        39
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "DetailBanner",
+};
+</script>
+
+<style lang="stylus" scoped>
+.banner {
+  overflow: hidden;
+  height: 0;
+  padding-bottom: 55%;
+  position: relative;
+
+  .banner-img {
+    width: 100%;
+  }
+
+  .banner-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 0.6rem;
+    color: #fff;
+    display: flex;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));
+
+    .banner-tittle {
+      flex: 1;
+      font-size: 0.32rem;
+      padding: 0 0.2rem;
+    }
+
+    .banner-number {
+      padding: 0 0.4rem;
+      height: 0.32rem;
+      line-height: 0.32rem;
+      border-radius: 0.2rem;
+      background: rgba(0, 0, 0, 0.8);
+      font-size: 0.24rem;
+      margin-top: 0.14rem;
+
+      .banner-icon {
+        font-size: 0.24rem;
+      }
+    }
+  }
+}
+</style>
+```
+
+3. 在views文件夹下新建Detail.vue组件，如：
+```vue
+<template>
+    <div class="detail">
+        <detail-banner></detail-banner>
+    </div>
+</template>
+
+<script>
+import DetailBanner from '../components/Banner'
+export default {
+    name: 'Detail',
+    components: {
+    DetailBanner,
+  },
+}
+</script>
+```
+
+4. 在路由中引入Detail.vue组件，如：
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Home from '../views/Home.vue'
+import City from '../views/City.vue'
+import Detail from '../views/Detail.vue'
+
+Vue.use(VueRouter);
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/city',
+    name: 'City',
+    component: City
+  },
+  {
+    path: '/detail/:id',
+    name: 'Detail',
+    component: Detail
+  }
+]
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+})
+
+export default router
+```
+
 
