@@ -27,7 +27,11 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 切换页面的时候都回到最顶部
+    return { x: 0, y: 0 }
+  }
 })
 
 export default router

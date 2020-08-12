@@ -4802,6 +4802,8 @@ export default {
 </style>
 ```
 
+gallary.vue组件更新完成。
+
 2. 在Banner.vue组件引入gallary.vue组件，如：
 ```vue
 <template>
@@ -5226,5 +5228,218 @@ export default {
 }
 </style>
 ```
+
+#### 使用ajax获取详情页的动态数据
+
+1. 更新Detail.vue组件，如：
+```vue
+<template>
+  <div class="detail">
+    <detail-banner 
+        :sightName="sightName"
+        :bannerImg="bannerImg"
+        :bannerImgs="gallaryImgs"
+    ></detail-banner>
+    <detail-header></detail-header>
+    <div class="content">
+      <detail-list :list="list"></detail-list>
+    </div>
+  </div>
+</template>
+
+<script>
+import DetailBanner from "../components/Banner";
+import DetailHeader from "../components/DetailHeader";
+import DetailList from "../components/DetailList";
+import axios from "axios";
+
+export default {
+  name: "Detail", // 递归组件、取消某个页面的缓存
+  data() {
+    return {
+      sightName: "",
+      bannerImg: "",
+      gallaryImgs: [],
+      list: [],
+    };
+  },
+  components: {
+    DetailBanner,
+    DetailHeader,
+    DetailList,
+  },
+  methods: {
+    getDetailInfo() {
+      axios
+        .get("/api/detail.json", {
+          params: {
+            id: this.$route.params.id,
+          },
+        })
+        .then(this.handleGetDataSucc);
+    },
+    handleGetDataSucc(res) {
+      res = res.data;
+      if (res.ret && res.data) {
+        const data = res.data;
+        this.sightName = data.sightName;
+        this.bannerImg = data.bannerImg;
+        this.gallaryImgs = data.gallaryImgs;
+        this.list = data.categoryList;
+      }
+    },
+  },
+  mounted() {
+    this.getDetailInfo();
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.content {
+  height: 50rem;
+}
+</style>
+```
+
+Detail.vue组件更新完成。
+
+2. 更新Banner.vue组件，如：
+```vue
+<template>
+  <div>
+    <div class="banner" @click="handleBannerClick">
+      <img
+        class="banner-img"
+        :src="bannerImg"
+      />
+      <div class="banner-info">
+        <div class="banner-tittle">{{this.sightName}}</div>
+        <div class="banner-number">
+          <span class="iconfont banner-icon">&#xe635;</span>
+          {{this.bannerImgs.length}}
+        </div>
+      </div>
+    </div>
+    <common-gallary :imgs="bannerImgs" v-show="showGallary" @close="handleGallaryClose"></common-gallary>
+  </div>
+</template>
+
+<script>
+import CommonGallary from "../common/gallary/gallary";
+export default {
+  name: "DetailBanner",
+  props: {
+    sightName: String,
+    bannerImg: String,
+    bannerImgs: Array
+  },
+  data() {
+    return {
+      showGallary: false,
+    };
+  },
+  methods: {
+    handleBannerClick() {
+      this.showGallary = true;
+    },
+    handleGallaryClose () {
+        // 当画廊被点击会被自动关闭
+      this.showGallary = false;
+    }
+  },
+  components: {
+    CommonGallary,
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.banner {
+  overflow: hidden;
+  height: 0;
+  padding-bottom: 55%;
+  position: relative;
+
+  .banner-img {
+    width: 100%;
+  }
+
+  .banner-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 0.6rem;
+    color: #fff;
+    display: flex;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));
+
+    .banner-tittle {
+      flex: 1;
+      font-size: 0.32rem;
+      padding: 0 0.2rem;
+    }
+
+    .banner-number {
+      padding: 0 0.4rem;
+      height: 0.32rem;
+      line-height: 0.32rem;
+      border-radius: 0.2rem;
+      background: rgba(0, 0, 0, 0.8);
+      font-size: 0.24rem;
+      margin-top: 0.14rem;
+
+      .banner-icon {
+        font-size: 0.24rem;
+      }
+    }
+  }
+}
+</style>
+```
+
+3. 切换页面的时候都回到最顶部，更新router文件夹下的index.js，如：
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Home from '../views/Home.vue'
+import City from '../views/City.vue'
+import Detail from '../views/Detail.vue'
+
+Vue.use(VueRouter);
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/city',
+    name: 'City',
+    component: City
+  },
+  {
+    path: '/detail/:id',
+    name: 'Detail',
+    component: Detail
+  }
+]
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 切换页面的时候都回到最顶部
+    return { x: 0, y: 0 }
+  }
+})
+
+export default router
+```
+
+router文件夹下的index.js更新完成。
 
 
