@@ -5172,6 +5172,8 @@ export default {
 </style>
 ```
 
+DetailList.vue组件更新完成。
+
 2. 在Detail.vue组件引入DetailList.vue组件，如：
 ```vue
 <template>
@@ -5441,5 +5443,137 @@ export default router
 ```
 
 router文件夹下的index.js更新完成。
+
+#### 在项目中加入动画效果
+
+1. 在common文件夹下，新建一个文件夹Fade，在Fade文件夹下新建动画文件Fade.vue，如：
+```vue
+<template>
+  <transition>
+    <slot></slot>
+  </transition>
+</template>
+
+<script>
+export default {
+  name: "FadeAnimation",
+};
+</script>
+
+<style lang="stylus" scoped>
+.v-enter, .v-leave-to {
+  opacity: 0;
+}
+
+.v-enter-active, .v-leave-active {
+  transition: opacity 0.5s;
+}
+</style>
+```
+
+Fade.vue动画组件已更新完成。
+
+2. 在详情页中使用Fade.vue动画组件
+
+在Banner.vue组件中引入Fade.vue动画组件，如：
+```vue
+<template>
+  <div>
+    <div class="banner" @click="handleBannerClick">
+      <img
+        class="banner-img"
+        :src="bannerImg"
+      />
+      <div class="banner-info">
+        <div class="banner-tittle">{{this.sightName}}</div>
+        <div class="banner-number">
+          <span class="iconfont banner-icon">&#xe635;</span>
+          {{this.bannerImgs.length}}
+        </div>
+      </div>
+    </div>
+    <fade-animation>
+        <common-gallary :imgs="bannerImgs" v-show="showGallary" @close="handleGallaryClose"></common-gallary>
+    </fade-animation>
+  </div>
+</template>
+
+<script>
+import CommonGallary from "../common/gallary/gallary";
+import FadeAnimation from '../common/fade/Fade'
+export default {
+  name: "DetailBanner",
+  props: {
+    sightName: String,
+    bannerImg: String,
+    bannerImgs: Array
+  },
+  data() {
+    return {
+      showGallary: false,
+    };
+  },
+  methods: {
+    handleBannerClick() {
+      this.showGallary = true;
+    },
+    handleGallaryClose () {
+        // 当画廊被点击会被自动关闭
+      this.showGallary = false;
+    }
+  },
+  components: {
+    CommonGallary,
+    FadeAnimation
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.banner {
+  overflow: hidden;
+  height: 0;
+  padding-bottom: 55%;
+  position: relative;
+
+  .banner-img {
+    width: 100%;
+  }
+
+  .banner-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 0.6rem;
+    color: #fff;
+    display: flex;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));
+
+    .banner-tittle {
+      flex: 1;
+      font-size: 0.32rem;
+      padding: 0 0.2rem;
+    }
+
+    .banner-number {
+      padding: 0 0.4rem;
+      height: 0.32rem;
+      line-height: 0.32rem;
+      border-radius: 0.2rem;
+      background: rgba(0, 0, 0, 0.8);
+      font-size: 0.24rem;
+      margin-top: 0.14rem;
+
+      .banner-icon {
+        font-size: 0.24rem;
+      }
+    }
+  }
+}
+</style>
+```
+
+Banner.vue组件已更新完成。
 
 
