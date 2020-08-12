@@ -1,22 +1,47 @@
 <template>
-  <div class="banner">
-    <img
-      class="banner-img"
-      src="https://tr-osdcp.qunarzz.com/tr-osd-tr-space/img/f1a9be7a999cfb38a16303c124814f70.jpg?ver=1"
-    />
-    <div class="banner-info">
-      <div class="banner-tittle">大量数十三点是的地方方法共同话题</div>
-      <div class="banner-number">
-        <span class="iconfont banner-icon">&#xe635;</span>
-        39
+  <div>
+    <div class="banner" @click="handleBannerClick">
+      <img
+        class="banner-img"
+        src="https://tr-osdcp.qunarzz.com/tr-osd-tr-space/img/f1a9be7a999cfb38a16303c124814f70.jpg?ver=1"
+      />
+      <div class="banner-info">
+        <div class="banner-tittle">大量数十三点是的地方方法共同话题</div>
+        <div class="banner-number">
+          <span class="iconfont banner-icon">&#xe635;</span>
+          39
+        </div>
       </div>
     </div>
+    <common-gallary :imgs="bannerImgs" v-show="showGallary" @close="handleGallaryClose"></common-gallary>
   </div>
 </template>
 
 <script>
+import CommonGallary from "../common/gallary/gallary";
 export default {
   name: "DetailBanner",
+  data() {
+    return {
+      bannerImgs: [
+        "https://imgs.qunarzz.com/vs_ceph_vs_tts/7c76f5a6-ed53-4e3f-8ca3-fc825627e141.jpg_r_390x260x95_82f6e0e8.jpg",
+        "https://imgs.qunarzz.com/vs_ceph_vs_tts/5c9f3912-7c82-4f47-bbef-7a52b1eeadc2.jpg_r_390x260x95_b440e7c9.jpg",
+      ],
+      showGallary: false,
+    };
+  },
+  methods: {
+    handleBannerClick() {
+      this.showGallary = true;
+    },
+    handleGallaryClose () {
+        // 当画廊被点击会被自动关闭
+      this.showGallary = false;
+    }
+  },
+  components: {
+    CommonGallary,
+  },
 };
 </script>
 
