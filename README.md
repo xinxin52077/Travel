@@ -4896,4 +4896,126 @@ export default {
 </style>
 ```
 
+#### 实现详情页头部渐隐渐显效果
+
+1. 在components文件夹下，新建一个DetailHeader.vue组件，如：
+```vue
+<template>
+  <div>
+    <router-link tag="div" to="/" class="header-abs" v-show="showAbs">
+      <div class="iconfont header-abs-back">&#xe624;</div>
+    </router-link>
+    <div class="header-fixed" v-show="!showAbs" :style="opacityStyle">
+      <router-link to="/">
+        <div class="iconfont header-fixed-back">&#xe624;</div>
+      </router-link>景点详情
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "DetailHeader",
+  data() {
+    return {
+      showAbs: true,
+      opacityStyle: {
+        opacity: 0,
+      },
+    };
+  },
+  methods: {
+    handleScroll() {
+      const top = document.documentElement.scrollTop;
+      if (top > 60) {
+        let opacity = top / 140;
+        opacity = opacity > 1 ? 1 : opacity;
+        this.opacityStyle = { opacity };
+        this.showAbs = false;
+      } else {
+        this.showAbs = true;
+      }
+    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header-abs {
+  position: absolute;
+  left: 0.2rem;
+  top: 0.2rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 0.4rem;
+  background: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  line-height: 0.8rem;
+
+  .header-abs-back {
+    color: #fff;
+    font-size: 0.4rem;
+  }
+}
+
+.header-fixed {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $headerHeight;
+  line-height: $headerHeight;
+  text-align: center;
+  color: #fff;
+  background: $bgColor;
+  font-size: 0.32rem;
+
+  .header-fixed-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.64rem;
+    text-align: center;
+    font-size: 0.4rem;
+    color: #fff;
+  }
+}
+</style>
+```
+
+2. 在Detail.vue组件引入DetailHeader.vue组件，如：
+```vue
+<template>
+  <div class="detail">
+    <detail-banner></detail-banner>
+    <detail-header></detail-header>
+    <div class="content"></div>
+  </div>
+</template>
+
+<script>
+import DetailBanner from "../components/Banner";
+import DetailHeader from "../components/DetailHeader";
+export default {
+  name: "Detail",
+  components: {
+    DetailBanner,
+    DetailHeader,
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.content {
+  height: 50rem;
+}
+</style>
+```
+
 
