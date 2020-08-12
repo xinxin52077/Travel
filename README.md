@@ -3077,4 +3077,1342 @@ export default {
 </script>
 ```
 
+#### 使用vuex实现数据共享
+
+1. city与home组件之间的通信
+
+更新CityList.vue组件，当点击热门城市来切换当前城市，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">{{ this.$store.state.city }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div 
+          class="button-wrapper" 
+          v-for="item of hot"
+          :key="item.id"
+          @click="handleCityClick(item.name)"
+          >
+            <div class="button">{{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div 
+      class="area" 
+      v-for="(item, key) of cities"
+      :key="key"
+      :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+          class="item border-bottom"
+          v-for="innerItem of item"
+          :key="innerItem.id"
+          >{{innerItem.name}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CityList",
+  props: {
+    hot: Array,
+    cities: Object,
+    letter: String
+  },
+  methods: {
+    handleCityClick (city) {
+      // console.log(city);
+      // this.$store.dispatch('changeCity', city);
+      this.$store.commit('changeCity', city);
+    },
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
+  },
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+Header.vue更新一下，如：
+```vue
+<template>
+  <div class="header">
+    <!-- 左边 -->
+    <div class="header-left">
+      <div class="iconfont back-icon">&#xe624;</div>
+    </div>
+
+    <!-- 中间输入框 -->
+    <div class="header-input">
+      <span class="iconfont">&#xe632;</span>
+      输入城市/景点/游玩主题
+    </div>
+
+    <!-- 右边 -->
+    <router-link to="/city">
+      <div class="header-right">
+        {{ this.$store.state.city }}
+        <span class="iconfont arrow-icon">&#xe64a;</span>
+      </div>
+    </router-link>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeHeader",
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header {
+  display: flex;
+  line-height: $headerHeight;
+  background: $bgColor;
+  color: #fff;
+
+  .header-left {
+    width: 0.64rem;
+    float: left;
+
+    .back-icon {
+      text-align: center;
+      font-size: 0.4rem;
+    }
+  }
+
+  .header-input {
+    flex: 1;
+    background: #fff;
+    border-radius: 0.1rem;
+    margin-top: 0.12rem;
+    height: 0.64rem;
+    margin-left: 0.2rem;
+    color: #ccc;
+    line-height: 0.64rem;
+    padding-left: 0.2rem;
+  }
+
+  .header-right {
+    width: 1.24rem;
+    float: right;
+    text-align: center;
+    color: #fff
+
+    .arrow-icon {
+      font-size: 0.24rem;
+      margit-left: -0.04rem;
+    }
+  }
+}
+</style>
+```
+
+要实现数据的切换，需要使用vuex，找到store文件夹下的index.js，更新一下，如：
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+  state: {
+    city: '北京'
+  },
+  mutations: {
+    changeCity(state, city) {
+      state.city = city;
+    }
+  },
+  // actions: {
+  //   changeCity(ctx, city) {
+  //     // console.log(city);
+  //     ctx.commit('changeCity', city);
+  //   }
+  // },
+  modules: {
+  }
+})
+```
+
+2. 更新CityList.vue组件，当点击字母列表城市来切换当前城市，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">{{ this.$store.state.city }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div 
+          class="button-wrapper" 
+          v-for="item of hot"
+          :key="item.id"
+          @click="handleCityClick(item.name)"
+          >
+            <div class="button">{{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div 
+      class="area" 
+      v-for="(item, key) of cities"
+      :key="key"
+      :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+          class="item border-bottom"
+          v-for="innerItem of item"
+          :key="innerItem.id"
+          @click="handleCityClick(innerItem.name)"
+          >{{innerItem.name}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CityList",
+  props: {
+    hot: Array,
+    cities: Object,
+    letter: String
+  },
+  methods: {
+    handleCityClick (city) {
+      // console.log(city);
+      // this.$store.dispatch('changeCity', city);
+      this.$store.commit('changeCity', city);
+    },
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
+  },
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+也更新一下CitySearch.vue组件，如：
+```vue
+<template>
+  <div>
+    <div class="search">
+      <input v-model="keyword" class="search-input" type="text" placeholder="输入城市名或拼音" />
+    </div>
+
+    <div class="search-content" ref="search" v-show="keyword">
+      <ul>
+        <li class="search-item border-bottom" 
+        v-for="item of list" 
+        :key="item.id"
+        @click="handleCityClick(item.name)"
+        >{{item.name}}</li>
+        <li class="search-item border-bottom" v-show="hasNoData">
+          没有找到匹配数据
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CitySearch",
+  props: {
+    cities: Object,
+  },
+  data() {
+    return {
+      keyword: "",
+      list: [],
+      timer: null,
+    };
+  },
+  methods: {
+    handleCityClick (city) {
+      // console.log(city);
+      // this.$store.dispatch('changeCity', city);
+      this.$store.commit('changeCity', city);
+    },
+  },
+  computed: {
+    hasNoData () {
+      return !this.list.length
+    }
+  },
+  watch: {
+    keyword() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if (!this.keyword) {
+        this.list = []
+        return
+      }
+      this.timer = setTimeout(() => {
+        const result = [];
+        for (let i in this.cities) {
+          this.cities[i].forEach((value) => {
+            if (
+              value.spell.indexOf(this.keyword) > -1 ||
+              value.name.indexOf(this.keyword) > -1
+            ) {
+              result.push(value);
+            }
+          });
+        }
+        this.list = result;
+      }, 100);
+    },
+  },
+  mounted () {
+      // 滚动效果
+    this.scroll = new Bscroll(this.$refs.search)
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles.styl';
+
+.search {
+  height: 0.72rem;
+  background: $bgColor;
+  padding: 0 0.1rem;
+
+  .search-input {
+    height: 0.62rem;
+    line-height: 0.62rem;
+    width: 100%;
+    text-align: center;
+    border-radius: 0.06rem;
+    color: #666;
+    padding: 0 0.1rem;
+    box-sizing: border-box;
+  }
+}
+
+.search-content {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #eee;
+  overflow: hidden;
+  z-index: 1;
+
+  .search-item {
+    line-height: 0.62rem;
+    padding-left: 0.2rem;
+    color: #666;
+    background: #fff;
+  }
+}
+</style>
+```
+
+3. 当我们点击城市的时候需要回到首页，需要对路由进行配置。
+
+更新CityList.vue，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">{{ this.$store.state.city }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div 
+          class="button-wrapper" 
+          v-for="item of hot"
+          :key="item.id"
+          @click="handleCityClick(item.name)"
+          >
+            <div class="button">{{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div 
+      class="area" 
+      v-for="(item, key) of cities"
+      :key="key"
+      :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+          class="item border-bottom"
+          v-for="innerItem of item"
+          :key="innerItem.id"
+          @click="handleCityClick(innerItem.name)"
+          >{{innerItem.name}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CityList",
+  props: {
+    hot: Array,
+    cities: Object,
+    letter: String
+  },
+  methods: {
+    handleCityClick (city) {
+      this.$store.commit('changeCity', city);
+      this.$router.push('/'); // 点击跳转到首页
+    },
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
+  },
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+更新CitySearch.vue，如：
+```vue
+<template>
+  <div>
+    <div class="search">
+      <input v-model="keyword" class="search-input" type="text" placeholder="输入城市名或拼音" />
+    </div>
+
+    <div class="search-content" ref="search" v-show="keyword">
+      <ul>
+        <li class="search-item border-bottom" 
+        v-for="item of list" 
+        :key="item.id"
+        @click="handleCityClick(item.name)"
+        >{{item.name}}</li>
+        <li class="search-item border-bottom" v-show="hasNoData">
+          没有找到匹配数据
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+export default {
+  name: "CitySearch",
+  props: {
+    cities: Object,
+  },
+  data() {
+    return {
+      keyword: "",
+      list: [],
+      timer: null,
+    };
+  },
+  methods: {
+    handleCityClick (city) {
+      this.$store.commit('changeCity', city);
+      this.$router.push('/'); // 点击跳转到首页
+    },
+  },
+  computed: {
+    hasNoData () {
+      return !this.list.length
+    }
+  },
+  watch: {
+    keyword() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if (!this.keyword) {
+        this.list = []
+        return
+      }
+      this.timer = setTimeout(() => {
+        const result = [];
+        for (let i in this.cities) {
+          this.cities[i].forEach((value) => {
+            if (
+              value.spell.indexOf(this.keyword) > -1 ||
+              value.name.indexOf(this.keyword) > -1
+            ) {
+              result.push(value);
+            }
+          });
+        }
+        this.list = result;
+      }, 100);
+    },
+  },
+  mounted () {
+      // 滚动效果
+    this.scroll = new Bscroll(this.$refs.search)
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles.styl';
+
+.search {
+  height: 0.72rem;
+  background: $bgColor;
+  padding: 0 0.1rem;
+
+  .search-input {
+    height: 0.62rem;
+    line-height: 0.62rem;
+    width: 100%;
+    text-align: center;
+    border-radius: 0.06rem;
+    color: #666;
+    padding: 0 0.1rem;
+    box-sizing: border-box;
+  }
+}
+
+.search-content {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #eee;
+  overflow: hidden;
+  z-index: 1;
+
+  .search-item {
+    line-height: 0.62rem;
+    padding-left: 0.2rem;
+    color: #666;
+    background: #fff;
+  }
+}
+</style>
+```
+
+4. 刷新首页后，选择的城市还存在。
+
+更新store文件夹下的index.js，如：
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+let defaultCity = '上海'
+try{
+  if(localStorage.city) {
+    defaultCity = localStorage.city;
+  }
+}catch(e) {}
+
+export default new Vuex.Store({
+  state: {
+    // city: localStorage.city || '上海'
+    city: defaultCity
+  },
+  mutations: {
+    changeCity(state, city) {
+      state.city = city;
+      // localStorage.city = city; // 存储城市
+      try{
+        localStorage.city = city; // 存储城市
+      }catch(e) {}
+    }
+  },
+  modules: {
+  }
+})
+```
+
+- 优化代码:
+
+把store文件夹下的index.js的数据分开保存，以提高性能，如：
+在store文件夹下，新建state.js文件，如：
+```js
+let defaultCity = '上海'
+try {
+  if (localStorage.city) {
+    defaultCity = localStorage.city
+  }
+} catch (e) {}
+
+export default {
+  city: defaultCity
+}
+```
+
+在store文件夹下，新建mutations.js文件，如：
+```js
+export default {
+  changeCity (state, city) {
+    state.city = city
+    try {
+      localStorage.city = city
+    } catch (e) {}
+  }
+}
+```
+
+更新store文件夹下的index.js，如：
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import state from './state'
+import mutations from './mutations'
+
+Vue.use(Vuex)
+
+// let defaultCity = '上海'
+// try{
+//   if(localStorage.city) {
+//     defaultCity = localStorage.city;
+//   }
+// }catch(e) {}
+
+export default new Vuex.Store({
+  state: state,
+  // mutations: {
+  //   changeCity(state, city) {
+  //     state.city = city;
+  //     try{
+  //       localStorage.city = city; // 存储城市
+  //     }catch(e) {}
+  //   }
+  // },
+  mutations: mutations,
+  modules: {
+  }
+})
+```
+
+优化store文件夹下的index.js，如：
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import state from './state'
+import mutations from './mutations'
+
+Vue.use(Vuex);
+
+export default new Vuex.Store({
+  state,
+  mutations,
+})
+```
+
+store文件后期不再更新。
+
+5. 优化首页城市切换的样式，如：
+
+打开Header.vue组件，更改一下.header-right样式，如：
+```vue
+<template>
+  <div class="header">
+    <!-- 左边 -->
+    <div class="header-left">
+      <div class="iconfont back-icon">&#xe624;</div>
+    </div>
+
+    <!-- 中间输入框 -->
+    <div class="header-input">
+      <span class="iconfont">&#xe632;</span>
+      输入城市/景点/游玩主题
+    </div>
+
+    <!-- 右边 -->
+    <router-link to="/city">
+      <div class="header-right">
+        {{ this.$store.state.city }}
+        <span class="iconfont arrow-icon">&#xe64a;</span>
+      </div>
+    </router-link>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "HomeHeader",
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header {
+  display: flex;
+  line-height: $headerHeight;
+  background: $bgColor;
+  color: #fff;
+
+  .header-left {
+    width: 0.64rem;
+    float: left;
+
+    .back-icon {
+      text-align: center;
+      font-size: 0.4rem;
+    }
+  }
+
+  .header-input {
+    flex: 1;
+    background: #fff;
+    border-radius: 0.1rem;
+    margin-top: 0.12rem;
+    height: 0.64rem;
+    margin-left: 0.2rem;
+    color: #ccc;
+    line-height: 0.64rem;
+    padding-left: 0.2rem;
+  }
+
+  .header-right {
+    min-width: 1.04rem;
+    padding: 0 .1rem;
+    float: right;
+    text-align: center;
+    color: #fff
+
+    .arrow-icon {
+      font-size: 0.24rem;
+      margit-left: -0.04rem;
+    }
+  }
+}
+</style>
+```
+
+6. 对vuex使用的代码进行优化
+
+- 更新Header.vue组件，如：
+```vue
+<template>
+  <div class="header">
+    <!-- 左边 -->
+    <div class="header-left">
+      <div class="iconfont back-icon">&#xe624;</div>
+    </div>
+
+    <!-- 中间输入框 -->
+    <div class="header-input">
+      <span class="iconfont">&#xe632;</span>
+      输入城市/景点/游玩主题
+    </div>
+
+    <!-- 右边 -->
+    <router-link to="/city">
+      <div class="header-right">
+        {{ this.city }}
+        <span class="iconfont arrow-icon">&#xe64a;</span>
+      </div>
+    </router-link>
+  </div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+export default {
+  name: "HomeHeader",
+  computed: {
+    // 使用vuex映射到city
+    ...mapState(['city'])
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles';
+
+.header {
+  display: flex;
+  line-height: $headerHeight;
+  background: $bgColor;
+  color: #fff;
+
+  .header-left {
+    width: 0.64rem;
+    float: left;
+
+    .back-icon {
+      text-align: center;
+      font-size: 0.4rem;
+    }
+  }
+
+  .header-input {
+    flex: 1;
+    background: #fff;
+    border-radius: 0.1rem;
+    margin-top: 0.12rem;
+    height: 0.64rem;
+    margin-left: 0.2rem;
+    color: #ccc;
+    line-height: 0.64rem;
+    padding-left: 0.2rem;
+  }
+
+  .header-right {
+    min-width: 1.04rem;
+    padding: 0 .1rem;
+    float: right;
+    text-align: center;
+    color: #fff
+
+    .arrow-icon {
+      font-size: 0.24rem;
+      margit-left: -0.04rem;
+    }
+  }
+}
+</style>
+```
+
+Header.vue组件更新完成，后期不再更新。
+
+- 更新CityList.vue，如：
+```vue
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <!-- 当前城市 -->
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">{{ this.currentCity }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热门城市 -->
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div 
+          class="button-wrapper" 
+          v-for="item of hot"
+          :key="item.id"
+          @click="handleCityClick(item.name)"
+          >
+            <div class="button">{{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字母选择城市 -->
+      <div 
+      class="area" 
+      v-for="(item, key) of cities"
+      :key="key"
+      :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+          class="item border-bottom"
+          v-for="innerItem of item"
+          :key="innerItem.id"
+          @click="handleCityClick(innerItem.name)"
+          >{{innerItem.name}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from 'better-scroll'
+import { mapState, mapMutations } from 'vuex'
+export default {
+  name: "CityList",
+  props: {
+    hot: Array,
+    cities: Object,
+    letter: String
+  },
+  computed: {
+    ...mapState({
+      currentCity: 'city'
+    })
+  },
+  methods: {
+    handleCityClick (city) {
+      // this.$store.commit('changeCity', city);
+      this.changeCity(city);
+      this.$router.push('/'); // 点击跳转到首页
+    },
+    ...mapMutations(['changeCity'])
+  },
+  watch: {
+    letter () {
+      // 字母表的滚动
+      if (this.letter) {
+        const element = this.$refs[this.letter][0];
+        this.scroll.scrollToElement(element);
+      }
+    }
+  },
+  mounted () {
+    // 滑动
+    this.scroll = new Bscroll(this.$refs.wrapper);
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+.border-topbottom {
+  &:before {
+    border-color: #ccc;
+  }
+
+  &:after {
+    border-color: #ccc;
+  }
+}
+
+.border-bottom {
+  &:before {
+    border-color: #ccc;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .title {
+    line-height: 0.54rem;
+    background: #eee;
+    padding-left: 0.2rem;
+    color: #666;
+    font-size: 0.26rem;
+  }
+
+  .button-list {
+    padding: 0.1rem 0.6rem 0.1rem 0.1rem;
+    overflow: hidden;
+
+    .button-wrapper {
+      width: 33.33%;
+      float: left;
+
+      .button {
+        text-align: center;
+        margin: 0.1rem;
+        padding: 0.1rem 0;
+        border: 0.02rem solid #ccc;
+        border-radius: 0.06rem;
+      }
+    }
+  }
+
+  .item-list {
+    .item {
+      line-height: 0.76rem;
+      padding-left: 0.2rem;
+    }
+  }
+}
+</style>
+```
+
+CityList.vue组件更新完成，后期不再更新。
+
+- 更新CitySearch.vue，如：
+```vue
+<template>
+  <div>
+    <div class="search">
+      <input v-model="keyword" class="search-input" type="text" placeholder="输入城市名或拼音" />
+    </div>
+
+    <div class="search-content" ref="search" v-show="keyword">
+      <ul>
+        <li
+          class="search-item border-bottom"
+          v-for="item of list"
+          :key="item.id"
+          @click="handleCityClick(item.name)"
+        >{{item.name}}</li>
+        <li class="search-item border-bottom" v-show="hasNoData">没有找到匹配数据</li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import Bscroll from "better-scroll";
+import { mapMutations } from "vuex";
+export default {
+  name: "CitySearch",
+  props: {
+    cities: Object,
+  },
+  data() {
+    return {
+      keyword: "",
+      list: [],
+      timer: null,
+    };
+  },
+  methods: {
+    handleCityClick(city) {
+      //   this.$store.commit('changeCity', city);
+      this.changeCity(city);
+      this.$router.push("/"); // 点击跳转到首页
+    },
+    ...mapMutations(["changeCity"]),
+  },
+  computed: {
+    hasNoData() {
+      return !this.list.length;
+    },
+  },
+  watch: {
+    keyword() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if (!this.keyword) {
+        this.list = [];
+        return;
+      }
+      this.timer = setTimeout(() => {
+        const result = [];
+        for (let i in this.cities) {
+          this.cities[i].forEach((value) => {
+            if (
+              value.spell.indexOf(this.keyword) > -1 ||
+              value.name.indexOf(this.keyword) > -1
+            ) {
+              result.push(value);
+            }
+          });
+        }
+        this.list = result;
+      }, 100);
+    },
+  },
+  mounted() {
+    // 滚动效果
+    this.scroll = new Bscroll(this.$refs.search);
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '../assets/varibles.styl';
+
+.search {
+  height: 0.72rem;
+  background: $bgColor;
+  padding: 0 0.1rem;
+
+  .search-input {
+    height: 0.62rem;
+    line-height: 0.62rem;
+    width: 100%;
+    text-align: center;
+    border-radius: 0.06rem;
+    color: #666;
+    padding: 0 0.1rem;
+    box-sizing: border-box;
+  }
+}
+
+.search-content {
+  position: absolute;
+  top: 1.58rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #eee;
+  overflow: hidden;
+  z-index: 1;
+
+  .search-item {
+    line-height: 0.62rem;
+    padding-left: 0.2rem;
+    color: #666;
+    background: #fff;
+  }
+}
+</style>
+```
+
+CitySearch.vue组件更新完成，后期不再更新。
+
 
