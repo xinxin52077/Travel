@@ -36,7 +36,6 @@ export default {
   line-height: 0.8rem;
   background: #eee;
   text-indent: 0.2rem;
-  margin-top: 0.2rem;
 }
 
 .item {

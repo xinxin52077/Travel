@@ -1,6 +1,6 @@
 <template>
   <div class="icons">
-    <swiper :options="swiperOption">
+    <swiper :options="iconsOption">
       <swiper-slide v-for="(page, index) of pages" :key="index">
         <div class="icon" v-for="item of page" :key="item.id">
           <div class="icon-img">
@@ -9,6 +9,7 @@
           <p class="icon-desc">{{ item.desc }}</p>
         </div>
       </swiper-slide>
+      <div class="swiper-pagination" slot="pagination"></div>
     </swiper>
   </div>
 </template>
@@ -21,7 +22,8 @@ export default {
   },
   data() {
     return {
-      swiperOption: {
+      iconsOption: {
+        pagination: ".swiper-pagination",
         // 禁止自动轮播
         autoplay: false
       }
@@ -47,9 +49,14 @@ export default {
 @import '../assets/varibles';
 @import '../assets/mixins.styl';
 
+// 改变轮播图圆点的颜色
+.icons >>> .swiper-pagination-bullet-active {
+  background: rgba(0,175,190,.8);
+}
+
 .icons >>> .swiper-container {
   height: 0;
-  padding-bottom: 50%;
+  padding-bottom: 56%;
 }
 
 .icons {

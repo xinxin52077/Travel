@@ -21,6 +21,8 @@ export default {
       swiperOptions: {
         pagination: ".swiper-pagination",
         loop: true, // 循环轮播
+        speed: 400,
+        autoplay: 2000,
       }
     };
   },
