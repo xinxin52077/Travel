@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     handClick() {
-      console.log("aaaa");
+      // console.log("aaaa");
       this.$router.push("/city");
     },
   },
