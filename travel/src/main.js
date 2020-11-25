@@ -17,6 +17,8 @@ import './assets/iconfont.css'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import 'swiper/dist/css/swiper.css'
 
+import 'default-passive-events'
+
 Vue.config.productionTip = false;
 
 // 绑定fastclick
