@@ -12,8 +12,8 @@
     </div>
 
     <!-- 右边 -->
-    <router-link to="/city">
-      <div class="header-right">
+    <router-link to="/city" href="#">
+      <div class="header-right" @click="handClick">
         {{ this.city }}
         <span class="iconfont arrow-icon">&#xe64a;</span>
       </div>
@@ -28,6 +28,11 @@ export default {
   computed: {
     // 使用vuex映射到city
     ...mapState(['city'])
+  },
+  methods: {
+    handClick() {
+      console.log("aaaa");
+    }
   }
 };
 </script>
