@@ -12,28 +12,29 @@
     </div>
 
     <!-- 右边 -->
-    <router-link to="/city" href="#">
-      <div class="header-right" @click="handClick">
+    <div class="header-right" @click="handClick">
+      <!-- <router-link tag="div" to="/city"> -->
         {{ this.city }}
         <span class="iconfont arrow-icon">&#xe64a;</span>
-      </div>
-    </router-link>
+      <!-- </router-link> -->
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 export default {
   name: "HomeHeader",
   computed: {
     // 使用vuex映射到city
-    ...mapState(['city'])
+    ...mapState(["city"]),
   },
   methods: {
     handClick() {
       console.log("aaaa");
-    }
-  }
+      this.$router.push("/city");
+    },
+  },
 };
 </script>
 
@@ -70,10 +71,10 @@ export default {
 
   .header-right {
     min-width: 1.04rem;
-    padding: 0 .1rem;
+    padding: 0 0.1rem;
     float: right;
     text-align: center;
-    color: #fff
+    color: #fff;
 
     .arrow-icon {
       font-size: 0.24rem;
