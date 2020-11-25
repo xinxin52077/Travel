@@ -1,4 +1,8 @@
 module.exports = {
+    publicPath: "./", // 基本路径
+    outputDir: "dist", // 构建时的输出目录
+    assetsDir: "static", // 放置静态资源的目录
+    indexPath: "index.html", // html的输出路径
     devServer: {
       open: true,
       host: 'localhost',
@@ -8,7 +12,7 @@ module.exports = {
         '/api': {
           target: 'http://localhost:8080',
           pathRewrite: {
-            '^/api': '/json'
+            '^/api': './json'
           }
         }
       },
